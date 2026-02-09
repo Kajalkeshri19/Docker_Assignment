@@ -22,7 +22,6 @@ docker run -d \
   --name redis-cache \
   -p 6379:6379 \
   -v $(pwd)/redis.conf:/usr/local/etc/redis/redis.conf \
-  --network app-network \
   redis redis-server /usr/local/etc/redis/redis.conf
 
 # NODE APP
@@ -31,7 +30,6 @@ docker run -d \
   -p 3000:3000 \
   -v $(pwd)/app:/usr/src/app \
   -w /usr/src/app \
-  --network app-network \
   node:18 \
   sh -c "npm install && node server.js"
 
