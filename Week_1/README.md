@@ -28,5 +28,5 @@ This repository contains my **Week 1 Docker assignment**, where I explored Docke
 
 ## How to Run
 ```bash
-chmod +x docker-commands.sh
-./docker-commands.sh
+chmod +x docker-command.sh
+./docker-command.sh
