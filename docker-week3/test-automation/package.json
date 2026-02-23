@@ -1,0 +1,12 @@
+{
+  "name": "playwright-tests",
+  "version": "1.0.0",
+  "description": "Test automation framework using Playwright",
+  "scripts": {
+    "test": "node ci_run_tests.js",
+    "ci-test": "node ci_run_tests.js"
+  },
+  "dependencies": {
+    "playwright-chromium": "^1.40.0"
+  }
+}

@@ -1,0 +1,25 @@
+# Static Website Dockerfile - ULTRA-AGGRESSIVE Optimization
+# Target: <25MB using busybox (~5MB) + httpd server
+# BusyBox is 5MB, adds ~19MB for assets = ~24MB total
+
+# Stage 1: Builder
+FROM alpine:latest AS builder
+
+WORKDIR /build
+COPY build/ ./
+
+# Stage 2: Runtime - Ultra-minimal BusyBox (~5MB)
+FROM busybox:latest
+
+WORKDIR /var/www/html
+
+# Copy static assets
+COPY --from=builder /build/ /var/www/html/
+
+# Expose port
+EXPOSE 80
+
+# BusyBox httpd command: busybox httpd -f -v /path
+# -f: run in foreground
+# -v: verbose logging
+CMD ["sh", "-c", "exec busybox httpd -f -v"]

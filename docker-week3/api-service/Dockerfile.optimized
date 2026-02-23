@@ -1,0 +1,37 @@
+# API Service Dockerfile - ULTRA-AGGRESSIVE Optimization
+# Target: <150MB using minimal base images
+# Strategy: Use distroless/nodejs20-debian11:nonroot (much smaller than Alpine)
+
+# Stage 1: Dependencies Builder
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+
+RUN npm install --omit=dev --omit=optional && \
+    npm cache clean --force && \
+    npm prune --omit=dev --production && \
+    # Aggressively remove non-essential files
+    find /app/node_modules -type f \( -name "*.md" -o -name "*.map" -o -name "*.ts" -o -name "*.json" -o -name "*.txt" -o -name "package.json" \) -delete && \
+    find /app/node_modules -type d \( -name ".bin" -o -name "test" -o -name "tests" -o -name "doc" -o -name "docs" -o -name "examples" \) -exec rm -rf {} + 2>/dev/null || true && \
+    rm -rf /root/.npm /root/.cache /tmp/*
+
+# Stage 2: Distroless Node (60MB base)
+FROM gcr.io/distroless/nodejs20-debian11:nonroot
+
+WORKDIR /app
+
+# Copy optimized node_modules
+COPY --from=builder /app/node_modules ./node_modules
+
+# Build native executable using pkg in a build container
+FROM node:18-alpine AS packer
+WORKDIR /app
+COPY package.json ./
+COPY server.js ./
+RUN npm install && npm run build && mkdir -p /out && mv ./dist/server /out/server
+
+FROM gcr.io/distroless/cc-debian11:nonroot
+COPY --from=packer /out/server /server
+EXPOSE 3000
+ENTRYPOINT ["/server"]

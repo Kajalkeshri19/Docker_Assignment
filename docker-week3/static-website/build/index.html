@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Docker Static Website - Production ready Nginx deployment">
+    <title>Static Website - Docker Assignment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Docker Static Website - Kajal Keshri</h1>
+            <p class="subtitle">Powered by Nginx Alpine</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>About This Project</h2>
+                <p>This is a production-ready static website running in a Docker container using the lightweight Nginx Alpine base image.</p>
+                <ul class="features-list">
+                    <li>✅ Nginx Alpine (minimal footprint &lt; 50MB)</li>
+                    <li>✅ Custom SPA routing configuration</li>
+                    <li>✅ Optimized caching headers</li>
+                    <li>✅ Gzip compression enabled</li>
+                    <li>✅ Security headers configured</li>
+                    <li>✅ Health check endpoint</li>
+                </ul>
+            </section>
+
+            <section class="card">
+                <h2>Docker Best Practices</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <h3>🔒 Secure</h3>
+                        <p>Running as non-root user with security headers enabled</p>
+                    </div>
+                    <div class="feature">
+                        <h3>⚡ Fast</h3>
+                        <p>Static asset caching with 1-year expiry and gzip compression</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📦 Tiny</h3>
+                        <p>Alpine Linux base image keeps total size under 50MB</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🎯 Production Ready</h3>
+                        <p>Health checks, error handling, and proper logging</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Technical Stack</h2>
+                <div class="tech-stack">
+                    <span class="badge">HTML5</span>
+                    <span class="badge">CSS3</span>
+                    <span class="badge">JavaScript</span>
+                    <span class="badge">Nginx</span>
+                    <span class="badge">Alpine Linux</span>
+                    <span class="badge">Docker</span>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>API Endpoints</h2>
+                <div class="endpoints">
+                    <div class="endpoint">
+                        <span class="method">GET</span>
+                        <span class="path">/</span>
+                        <span class="desc">Main page</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method">GET</span>
+                        <span class="path">/health</span>
+                        <span class="desc">Health check endpoint</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method">GET</span>
+                        <span class="path">/about</span>
+                        <span class="desc">About page (SPA routing)</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card links-section">
+                <h2>Quick Links</h2>
+                <div class="links">
+                    <a href="/health" class="button">Health Check</a>
+                    <a href="/about" class="button">About Page</a>
+                    <a href="/" class="button">Home</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Docker Week 2 Assignment - Static Website</p>
+            <p>Built with ❤️ using Nginx Alpine</p>
+            <p class="small">Image Size: &lt; 50MB | Response Time: &lt; 10ms</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
