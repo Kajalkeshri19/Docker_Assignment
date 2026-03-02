@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Week4 Frontend</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  </head>
+  <body>
+    <div id="root">Loading...</div>
+    <script>
+      const e = React.createElement;
+      const API_URL = (function(){ try { return window.API_URL || 'http://api:3000' } catch(e){ return 'http://api:3000' } })();
+
+      function App(){
+        const [items, setItems] = React.useState([]);
+        React.useEffect(()=>{
+          fetch('/api-proxy/items')
+            .then(r=>r.json())
+            .then(setItems)
+            .catch(()=>{});
+        },[]);
+        return e('div', null,
+          e('h1', null, 'Week4 Frontend'),
+          e('p', null, 'Simple frontend served by Nginx'),
+          e('ul', null, items.map(it=> e('li', {key:it.id}, `${it.id}: ${it.name}`)))
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+    </script>
+  </body>
+</html>
