@@ -18,6 +18,12 @@ on:
         required: false
         default: 'true'
 
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  security-events: write
+
 env:
   REGISTRY: docker.io
   REGISTRY_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
