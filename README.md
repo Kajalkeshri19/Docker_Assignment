@@ -123,7 +123,6 @@ docker-compose exec <service> curl http://localhost/health
 - [GITHUB_ACTIONS_GUIDE.md](GITHUB_ACTIONS_GUIDE.md) - Complete CI/CD setup
 - [PIPELINE_DIAGRAM.md](PIPELINE_DIAGRAM.md) - Architecture diagrams
 - [METRICS.md](METRICS.md) - Performance metrics
-- [PROCESS.md](PROCESS.md) - Development process
 - [SERVICE_DIAGRAM.md](SERVICE_DIAGRAM.md) - Service architecture
 
 ## Deployment
