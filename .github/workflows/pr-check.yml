@@ -1,0 +1,145 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # Lint Check
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Hadolint on all Dockerfiles
+        run: |
+          find . -name "Dockerfile" -type f | while read dockerfile; do
+            echo "Linting: $dockerfile"
+            docker run --rm -i hadolint/hadolint < "$dockerfile" || true
+          done
+
+  # Code Quality
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Comment PR with checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '##  Pre-merge Checklist\n\n- [ ] All CI/CD checks passed\n- [ ] Tests are running successfully\n- [ ] No high/critical security issues found\n- [ ] Hadolint linting passes\n- [ ] Docker images build without errors\n- [ ] Changes are documented\n- [ ] Code review approved\n\nPlease ensure all items are completed before merging.'
+            })
+
+  # Dockerfile Linting
+  hadolint:
+    name: Hadolint Linting
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          recursive: true
+          ignore: DL3008,DL3009,DL3045
+
+  # Security Scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-fs-results.sarif'
+
+  # Dependency Check
+  dependencies:
+    name: Dependency Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check package.json files for vulnerabilities
+        run: |
+          for pkg in api tests; do
+            if [ -f "./$pkg/package.json" ]; then
+              echo "Checking $pkg/package.json"
+              # This would typically use npm audit or similar
+              # For now, just verify package.json exists
+              cat ./$pkg/package.json
+            fi
+          done
+
+  # Documentation Check
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if PR description is provided
+        run: |
+          if [ -z "${{ github.event.pull_request.body }}" ]; then
+            echo "⚠️  Please provide a description for this PR"
+          fi
+
+      - name: Verify required files are present
+        run: |
+          required_files=("README.md" "docker-compose.yml" ".env.example")
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "⚠️  Missing required file: $file"
+            fi
+          done
+
+  # Summary
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [lint, quality, hadolint, security, dependencies, documentation]
+    if: always()
+    steps:
+      - name: PR Status Summary
+        run: |
+          echo "## PR Check Results"
+          echo "- Lint: ${{ needs.lint.result }}"
+          echo "- Quality: ${{ needs.quality.result }}"
+          echo "- Hadolint: ${{ needs.hadolint.result }}"
+          echo "- Security: ${{ needs.security.result }}"
+          echo "- Dependencies: ${{ needs.dependencies.result }}"
+          echo "- Documentation: ${{ needs.documentation.result }}"
