@@ -1,0 +1,107 @@
+version: "3.9"
+
+# Staging environment configuration for CI/CD testing
+# Uses test-specific settings and simplified setup
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: staging_db
+    environment:
+      - POSTGRES_USER=week4
+      - POSTGRES_PASSWORD=week4pass
+      - POSTGRES_DB=week4db
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U week4"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: staging_redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - staging-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "6379"
+
+  api:
+    image: api:test
+    container_name: staging_api
+    environment:
+      - PORT=3000
+      - PGHOST=db
+      - PGUSER=week4
+      - PGPASSWORD=week4pass
+      - PGDATABASE=week4db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NODE_ENV=test
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+
+  web:
+    image: web:test
+    container_name: staging_web
+    environment:
+      - API_URL=http://api:3000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "80"
+    ports:
+      - "8080:80"
+
+  tests:
+    image: tests:test
+    container_name: staging_tests
+    environment:
+      - API_URL=http://api:3000
+      - PWDEBUG=0
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    networks:
+      - staging-network
+    stdin_open: true
+    tty: true
+
+networks:
+  staging-network:
+    driver: bridge
