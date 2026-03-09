@@ -144,5 +144,3 @@ docker pull docker.io/<username>/tests:latest
 5. Pipeline auto-publishes
 
 ---
-
-**Version:** 1.0.0 | **Status:** Production Ready ✅ | **Last Updated:** March 7, 2024
