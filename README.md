@@ -1,4 +1,4 @@
-# Week 4 — Docker Compose Multi-Container App with CI/CD Pipeline
+# Week 5 — Docker Compose Multi-Container applications CI/CD Integration with Github Actions
 
 A complete multi-container environment demonstrating modern CI/CD practices with GitHub Actions, automated security scanning, and comprehensive testing.
 
